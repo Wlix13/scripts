@@ -10,8 +10,13 @@ echo $SHELL
 sudo sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 # Install Starship
-curl -sS https://starship.rs/install.sh | sh
+curl -sS https://starship.rs/install.sh | sh -y
 
-# Install Starship theme
+# Add to .zshrc
+echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+
+# Install Nerd Font Symbols Preset
 wget https://starship.rs/presets/toml/nerd-font-symbols.toml -O ~/.config/starship.toml
 
+# Remind user to comment Oh-My-ZSH theme
+echo "You need to comment out the 'ZSH_THEME' in ~/.zshrc"
