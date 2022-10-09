@@ -20,7 +20,7 @@ sudo make install
 
 # Remove old Python
 sudo apt remove python3 && sudo apt autoremove
-rm -rf Python-3.*
+cd .. && rm -rf Python-3.*
 
 # Make aliases
 echo 'alias python="python3"' >> ~/.zshrc

@@ -7,10 +7,10 @@ sudo usermod -s /usr/bin/zsh $(whoami)
 echo $SHELL
 
 # Install Oh-My-ZSH
-sudo sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 # Install Starship
-curl -sS https://starship.rs/install.sh | sh -y
+curl -sS https://starship.rs/install.sh | sh
 
 # Add to .zshrc
 echo 'eval "$(starship init zsh)"' >> ~/.zshrc
