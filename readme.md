@@ -1,7 +1,7 @@
 # <center>Scripts which I use to automate installing and configuring my systems</center>
 
 ## <center>Scripts list:</center>
-1) [starship.sh](#starship) - Installs starship prompt
+1) [zshprompt.sh](#zshprompt) - Installs starship prompt
 2) [python.sh](#python) - Compile and install python 3.10 from source
 3) [issue-cert.ps1](#issue-cert) - Issue OpenSSL certificate for local
 4) [format-udf.sh](#format-udf) - Format USB drive to UDF
@@ -10,9 +10,10 @@
 
 ## <center>Scripts description:</center>
 
-### **_<center><a name='starshop'></a>Starship.sh</center>_**
+### **_<center><a name='starshop'></a>ZSHPrompt.sh</center>_**
     - Installs zsh prompt
-    - Installs Oh-My-ZSH framework
+    - Installs Oh-My-ZSH framework and sets it as default
+    - Installs zsh-autosuggestions plugin(almost automaticly)
     - Intalls Starship prompt and sets it as default
     - Installs Nerd Font Symbols Preset
 
