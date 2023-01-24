@@ -4,8 +4,7 @@ export SRC_URL="https://www.python.org/ftp/python/3.10.9/Python-3.10.9.tgz"
 
 # Install dependencies 
 sudo apt update
-sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev libbluetooth-dev
-
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev libbz2-dev libbluetooth-dev -y
 
 # Download Python
 wget -q -O- $SRC_URL | tar -xz
@@ -23,7 +22,7 @@ sudo make install
 
 # Remove old Python
 sudo apt remove python3 -y && sudo apt autoremove -y
-cd .. && rm -rf Python-3.*
+cd .. && sudo rm -rf Python-3.*
 
 # Make aliases
 echo 'alias python="python3"' >> ~/.zshrc

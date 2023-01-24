@@ -19,7 +19,7 @@ except TypeError:
     print('Path for IMAGES or OTHER not found in .env file\nYou can add IMAGES and OTHER to .env file now')
     images = Path(input('Path for IMAGES: ')).resolve()
     other = Path(input('Path for OTHER: ')).resolve()
-    with open('.env1', 'a') as f:
+    with open('.env', 'a') as f:
         f.write(f"IMAGES='{images}'\n")
         f.write(f"OTHER='{other}'\n")
 
