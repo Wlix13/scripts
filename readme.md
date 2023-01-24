@@ -5,7 +5,8 @@
 2) [python.sh](#python) - Compile and install python 3.10 from source
 3) [issue-cert.ps1](#issue-cert) - Issue OpenSSL certificate for local
 4) [format-udf.sh](#format-udf) - Format USB drive to UDF
-5) [Rif.py](#format-udf) - Assistant cron for managing project files
+5) [dockerr.sh](#docker) - Install docker automatically
+6) [Rif.py](#format-udf) - Assistant cron for managing project files
 
 
 ## <center>Scripts description:</center>
@@ -31,3 +32,7 @@
 
 ### **_<center><a name='rif'></a>Rif.py</center>_**
     - Downloads files from remote server to local machine
+
+### **_<center><a name='docker'></a>Dockerr.sh</center>_**
+    - Installs docker and docker-compose
+    - Adds current user to docker group
