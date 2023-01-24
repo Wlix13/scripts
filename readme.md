@@ -6,7 +6,8 @@
 3) [issue-cert.ps1](#issue-cert) - Issue OpenSSL certificate for local
 4) [format-udf.sh](#format-udf) - Format USB drive to UDF
 5) [docker.sh](#docker) - Install docker automatically
-6) [Rif.py](#format-udf) - Assistant cron for managing project files
+6) [raspi.sh](#docker) - Automatically configure Raspberry Pi
+7) [Rif.py](#format-udf) - Assistant cron for managing project files
 
 
 ## <center>Scripts description:</center>
@@ -39,3 +40,8 @@
 ### **_<center><a name='docker'></a>Docker.sh</center>_**
     - Install docker and docker-compose
     - Add current user to docker group
+
+### **_<center><a name='raspi'></a>Raspi.sh</center>_**
+    - Create user and add it to sudo group
+    - Create wpa_supplicant config file
+    - Create Wi-Fi services 
