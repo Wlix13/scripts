@@ -30,13 +30,10 @@ wget https://starship.rs/presets/toml/nerd-font-symbols.toml -O ~/.config/starsh
 # Install zsh-autosuggestions
 sudo apt install git -y 
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+sed -i "s/plugins=(git)/plugins=(\ngit\nzsh-autosuggestions\n)/" ~/.zshrc
 
 # Install optional tools
-sudo apt install tmux mc locales -y
+sudo apt install tmux mc locales gcc g++ ssh-keygen -y
 
 # Configure locales
 sudo dpkg-reconfigure locales
-
-# Remind to add plugins
-echo "Add the plugin to the list of plugins for Oh My Zsh to load (inside ~/.zshrc):"
-echo "zsh-autosuggestions"
