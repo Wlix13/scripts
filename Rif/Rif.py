@@ -124,10 +124,12 @@ class SFTP:
 
 
 try:
+    # Connect to server and get list of files in selected directory
     serv = SFTP(USER, IP, SFTPPORT, Path('rif_rsa'))
-    folder = serv.listdir('/mnt/data')
+    folder = serv.listdir('/mnt/data') #TODO: make path to folder as env variable
 
 
+    # Download files to local machine
     for file in folder:
         if file.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp')):
             serv.download(folder[file], images / file)
