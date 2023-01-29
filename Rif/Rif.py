@@ -14,16 +14,41 @@ USER = os.getenv('USER')
 IP = os.getenv('IP')
 SFTPPORT = int(os.getenv('SFTPPORT'))
 
-try:
-    images = Path(os.getenv('IMAGES')).resolve()
-    other = Path(os.getenv('OTHER')).resolve()
-except TypeError:
-    print('Path for IMAGES or OTHER not found in .env file\nYou can add IMAGES and OTHER to .env file now')
-    images = Path(input('Path for IMAGES: ')).resolve()
-    other = Path(input('Path for OTHER: ')).resolve()
-    with open('.env', 'a') as f:
-        f.write(f"IMAGES = '{images}'\n")
-        f.write(f"OTHER = '{other}'\n")
+if os.name == 'posix':
+    try:
+        images = Path(os.getenv('IMAGES_OSX')).resolve()
+    except TypeError:
+        print('Path for IMAGES not found in .env file\nYou can add IMAGES path to .env file now')
+        images = Path(input('Path for IMAGES: ')).resolve()
+        with open('.env', 'a') as f:
+            f.write(f"\nIMAGES_OSX = '{images}'\n")
+    try:
+        other = Path(os.getenv('OTHER_OSX')).resolve()
+    except TypeError:
+        print('Path for OTHER not found in .env file\nYou can add OTHER path to .env file now')
+        other = Path(input('Path for OTHER: ')).resolve()
+        with open('.env', 'a') as f:
+            f.write(f"\nsOTHER_OSX = '{other}'\n")
+
+elif os.name == 'nt':
+    try:
+        images = Path(os.getenv('IMAGES_WINDOWS')).resolve()
+    except TypeError:
+        print('Path for IMAGES not found in .env file\nYou can add IMAGES path to .env file now')
+        images = Path(input('Path for IMAGES: ')).resolve()
+        with open('.env', 'a') as f:
+            f.write(f"IMAGES_WINDOWS = '{images}'\n")
+
+    try:
+        other = Path(os.getenv('OTHER_WINDOWS')).resolve()
+    except TypeError:
+        print('Path for OTHER not found in .env file\nYou can add OTHER path to .env file now')
+        other = Path(input('Path for OTHER: ')).resolve()
+        with open('.env', 'a') as f:
+            f.write(f"\nOTHER_WINDOWS = '{other}'\n")
+
+else:
+    raise OSError('OS not supported')
 
 
 class SFTP:
