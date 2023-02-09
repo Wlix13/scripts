@@ -1,12 +1,12 @@
 #!/usr/bin/env sh
 
 # Create a my user
-read  -p "Username:" USERNAME
+read  -p "Username: " USERNAME
 adduser $USERNAME
 
 # Install basics
 apt update
-apt install sudo wpasupplicant
+apt install sudo wpasupplicant -y
 usermod -aG sudo $USERNAME
 
 # Wi-Fi credentials input
