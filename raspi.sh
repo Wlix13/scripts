@@ -9,12 +9,17 @@ apt update
 apt install sudo wpasupplicant -y
 usermod -aG sudo $USERNAME
 
+# Change hostname
+read  -p "Hostname: " HOSTNAME
+echo $HOSTNAME > /etc/hostname
+echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
+
 # Wi-Fi credentials input
 read  -p "Wi-Fi SSID: " SSID
 read  -p "Wi-Fi Passphrase: " PSK
 
 # Create a wpa_supplicant.conf file
-echo "ctrl_interface=DIR=/var/run/wpa_supplicant" | tee -a /etc/wpa_supplicant.conf
+echo "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev" | tee -a /etc/wpa_supplicant.conf
 echo "update_config=1" | tee -a /etc/wpa_supplicant.conf
 echo "country=RU" | tee -a /etc/wpa_supplicant.conf
 echo "network={" | tee -a /etc/wpa_supplicant.conf
