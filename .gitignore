@@ -1,5 +1,16 @@
-/.vscode
-.DS_store
-.info.json
+# IDEAs
+.idea/*
+.vscode/*
+
+# Byte-compiled / optimized / DLL files
+**/__pycache__/
+
+# System files
+**/.DS_Store
+
+# Virtual Environment
 .env
 */*_rsa
+
+# Development
+test.*
