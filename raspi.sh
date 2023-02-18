@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Create a my user
-read  -p "Username: " USERNAME
+read -p "Username: " USERNAME
 adduser $USERNAME
 
 # Install basics
@@ -10,13 +10,13 @@ apt install sudo wpasupplicant -y
 usermod -aG sudo $USERNAME
 
 # Change hostname
-read  -p "Hostname: " HOSTNAME
+read -p "Hostname: " HOSTNAME
 echo $HOSTNAME > /etc/hostname
 echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
 
 # Wi-Fi credentials input
-read  -p "Wi-Fi SSID: " SSID
-read  -p "Wi-Fi Passphrase: " PSK
+read -p "Wi-Fi SSID: " SSID
+read -p "Wi-Fi Passphrase: " PSK
 
 # Create a wpa_supplicant.conf file
 echo "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev" | tee -a /etc/wpa_supplicant.conf

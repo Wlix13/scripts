@@ -4,10 +4,8 @@
 #
 # Copyright (C) 2018 Jonathan Elchison <JElchison@gmail.com>
 
-
 # setup Bash environment
 set -euf -o pipefail
-
 
 # handle following scenarios:
 #   * unprivileged user (i.e. not root, sudo not used)
@@ -16,7 +14,7 @@ set -euf -o pipefail
 SUDO=''
 if [[ $(id -u) -ne 0 ]]; then
     # verify that 'sudo' is present before assuming we can use it
-    if [[ ! -x $(which sudo 2>/dev/null) ]]; then
+    if [[ ! -x $(which sudo 2> /dev/null) ]]; then
         echo "[-] Dependencies unmet.  Please verify that 'sudo' is installed, executable, and in the PATH." >&2
         echo "Alternatively, you may also re-run this script as root." >&2
         exit 1
@@ -24,7 +22,6 @@ if [[ $(id -u) -ne 0 ]]; then
 
     SUDO='sudo'
 fi
-
 
 ###############################################################################
 # constants
@@ -37,7 +34,6 @@ HPC=255
 # maximum number of sectors per track
 SPT=63
 
-
 ###############################################################################
 # functions
 ###############################################################################
@@ -48,7 +44,7 @@ SPT=63
 # Returns:
 #   None
 print_usage() {
-    cat <<EOF >&2
+    cat << EOF >&2
 Bash script to format a block device (hard drive or Flash drive) in UDF.
 The output is a drive that can be used for reading/writing across multiple
 operating system families: Windows, macOS, and Linux.
@@ -106,7 +102,6 @@ Example:  $0 sdg "My UDF External Drive"
 EOF
 }
 
-
 # Prints hex representation of CHS (cylinder-head-sector) to stdout
 # Arguments:
 #   Logical block address (LBA)
@@ -114,14 +109,13 @@ EOF
 #   None
 function lba_to_chs {
     LBA=$1
-    C=$(((LBA/(HPC*SPT)) % (2**10)))
-    C_HI=$(((C>>8) % (2**2)))
-    C_LO=$((C % (2**8)))
-    H=$((((LBA/SPT) % HPC) % (2**8)))
-    S=$((((LBA % SPT) + 1) % (2**6)))
-    printf "%02x%02x%02x" $H $(((C_HI<<6)|S)) $C_LO
+    C=$(((LBA / (HPC * SPT)) % (2 ** 10)))
+    C_HI=$(((C >> 8) % (2 ** 2)))
+    C_LO=$((C % (2 ** 8)))
+    H=$((((LBA / SPT) % HPC) % (2 ** 8)))
+    S=$((((LBA % SPT) + 1) % (2 ** 6)))
+    printf "%02x%02x%02x" $H $(((C_HI << 6) | S)) $C_LO
 }
-
 
 # Prints hex representation of value in host byte order
 # Arguments:
@@ -138,7 +132,6 @@ function ntohl {
     fi
 }
 
-
 # Prints hex representation of entire-disk partition entry.  Reference:
 #   https://en.wikipedia.org/wiki/Master_boot_record
 #   https://en.wikipedia.org/wiki/Cylinder-head-sector
@@ -150,7 +143,7 @@ function ntohl {
 function entire_disk_partition_entry {
     TOTAL_SIZE=$1
     LOGICAL_BLOCK_SIZE=$2
-    MAX_LBA=$((TOTAL_SIZE/LOGICAL_BLOCK_SIZE))
+    MAX_LBA=$((TOTAL_SIZE / LOGICAL_BLOCK_SIZE))
 
     # status / physical drive (bit 7 set: active / bootable, old MBRs only accept 80h), 00h: inactive, 01h–7Fh: invalid)
     echo -n "00"
@@ -159,13 +152,13 @@ function entire_disk_partition_entry {
     # Partition type = FAT32 with CHS addressing
     echo -n "0b"
     # CHS address of last absolute sector in partition. The format is described by 3 bytes.
-    if [[ $MAX_LBA -ge $((1024*HPC*SPT-1)) ]]; then
+    if [[ $MAX_LBA -ge $((1024 * HPC * SPT - 1)) ]]; then
         # From https://en.wikipedia.org/wiki/Master_boot_record#Partition_table_entries
         # When a CHS address is too large to fit into these fields, the tuple (1023, 254, 63) is typically used today
         echo -n "feffff"
     else
         # '-1' yields last usable sector
-        lba_to_chs $((MAX_LBA-1))
+        lba_to_chs $((MAX_LBA - 1))
     fi
 
     # LBA of first absolute sector in the partition.
@@ -173,7 +166,7 @@ function entire_disk_partition_entry {
     ntohl 0
     # Number of sectors in partition.
     # Note lack of '-1' here, as we're interested in number of sectors.
-    if [[ $MAX_LBA -ge $(((2**32)-1)) ]]; then
+    if [[ $MAX_LBA -ge $(((2 ** 32) - 1)) ]]; then
         # Sadly, MBR type 0x0b caps this at a 32-bit value.
         # Using a different partition type wouldn't actually help, as UDF 2.01 itself has a limit of 2^32 blocks
         echo -n "ffffffff"
@@ -181,7 +174,6 @@ function entire_disk_partition_entry {
         ntohl $MAX_LBA
     fi
 }
-
 
 # Prints message assuring user that $DEVICE has not been changed
 # Arguments:
@@ -193,7 +185,6 @@ function exit_with_no_changes {
         echo "[*] Exiting without changes to /dev/$DEVICE"
     fi
 }
-
 
 ###############################################################################
 # set default options
@@ -207,71 +198,69 @@ WIPE_METHOD=quick
 # reset in case getopts has been used previously in the shell
 OPTIND=1
 
-
 ###############################################################################
 # parse options
 ###############################################################################
 
 while getopts ":b:fp:w:vh" opt; do
     case $opt in
-        b)
-            ARG_BLOCK_SIZE="$OPTARG"
-            # no need to validate this here, as BLOCK_SIZE is validated below (before anything destructive happens)
-            ;;
-        f)
-            FORCE=1
-            ;;
-        p)
-            PARTITION_TYPE="$OPTARG"
-            if [[ "$PARTITION_TYPE" != "mbr" ]] &&
-               [[ "$PARTITION_TYPE" != "none" ]]; then
-                echo "[-] Invalid partition type: $PARTITION_TYPE" >&2
-                print_usage
-                exit 1
-            fi
-            ;;
-        w)
-            WIPE_METHOD="$OPTARG"
-            if [[ "$WIPE_METHOD" != "quick" ]] &&
-               [[ "$WIPE_METHOD" != "zero" ]] &&
-               [[ "$WIPE_METHOD" != "scrub" ]]; then
-                echo "[-] Invalid wipe method: $WIPE_METHOD" >&2
-                print_usage
-                exit 1
-            fi
-            if [[ "$WIPE_METHOD" = "scrub" ]]; then
-                if [[ ! -x $(which scrub 2>/dev/null) ]]; then
-                    echo "[-] Dependencies unmet.  Please verify that the following are installed, executable, and in the PATH:  scrub" >&2
-                    exit 1
-                fi
-            fi
-            ;;
-        v)
-            echo "format-udf $VERSION"
-            echo "https://github.com/JElchison/format-udf"
-            echo "Copyright (C) 2017 Jonathan Elchison <JElchison@gmail.com>"
-            exit 0
-            ;;
-        h)
-            print_usage
-            exit 0
-            ;;
-        \?)
-            echo "[-] Invalid option '-$OPTARG'" >&2
+    b)
+        ARG_BLOCK_SIZE="$OPTARG"
+        # no need to validate this here, as BLOCK_SIZE is validated below (before anything destructive happens)
+        ;;
+    f)
+        FORCE=1
+        ;;
+    p)
+        PARTITION_TYPE="$OPTARG"
+        if [[ "$PARTITION_TYPE" != "mbr" ]] &&
+            [[ "$PARTITION_TYPE" != "none" ]]; then
+            echo "[-] Invalid partition type: $PARTITION_TYPE" >&2
             print_usage
             exit 1
-            ;;
-        :)
-            echo "[-] Option '-$OPTARG' requires an argument" >&2
+        fi
+        ;;
+    w)
+        WIPE_METHOD="$OPTARG"
+        if [[ "$WIPE_METHOD" != "quick" ]] &&
+            [[ "$WIPE_METHOD" != "zero" ]] &&
+            [[ "$WIPE_METHOD" != "scrub" ]]; then
+            echo "[-] Invalid wipe method: $WIPE_METHOD" >&2
             print_usage
             exit 1
-            ;;
+        fi
+        if [[ "$WIPE_METHOD" = "scrub" ]]; then
+            if [[ ! -x $(which scrub 2> /dev/null) ]]; then
+                echo "[-] Dependencies unmet.  Please verify that the following are installed, executable, and in the PATH:  scrub" >&2
+                exit 1
+            fi
+        fi
+        ;;
+    v)
+        echo "format-udf $VERSION"
+        echo "https://github.com/JElchison/format-udf"
+        echo "Copyright (C) 2017 Jonathan Elchison <JElchison@gmail.com>"
+        exit 0
+        ;;
+    h)
+        print_usage
+        exit 0
+        ;;
+    \?)
+        echo "[-] Invalid option '-$OPTARG'" >&2
+        print_usage
+        exit 1
+        ;;
+    :)
+        echo "[-] Option '-$OPTARG' requires an argument" >&2
+        print_usage
+        exit 1
+        ;;
     esac
 done
 
-shift $((OPTIND-1))
-([[ "$1" = "--" ]] 2>/dev/null && shift) || true
-
+shift $((OPTIND - 1))
+([[ "$1" = "--" ]] 2> /dev/null && shift) || true
 
 ###############################################################################
 # validate arguments
@@ -290,16 +279,21 @@ DEVICE=$1
 LABEL=$2
 
 # validate device identifier (may be partition)
-(echo "$DEVICE" | grep -Eq '^(([hs]d[a-z])([1-9][0-9]*)?|(disk[0-9]+)(s[1-9][0-9]*)?|(loop[0-9]+))$') || (echo "[-] <device> is of invalid form" >&2; false)
+(echo "$DEVICE" | grep -Eq '^(([hs]d[a-z])([1-9][0-9]*)?|(disk[0-9]+)(s[1-9][0-9]*)?|(loop[0-9]+))$') || (
+    echo "[-] <device> is of invalid form" >&2
+    false
+)
 
 # verify this is a device, not just a file
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-mount "/dev/$DEVICE" 2>/dev/null || true
-[[ -b "/dev/$DEVICE" ]] || (echo "[-] /dev/$DEVICE either doesn't exist or is not block special" >&2; false)
+mount "/dev/$DEVICE" 2> /dev/null || true
+[[ -b "/dev/$DEVICE" ]] || (
+    echo "[-] /dev/$DEVICE either doesn't exist or is not block special" >&2
+    false
+)
 
 # provide assuring exit message when exiting before making changes to the drive
 trap exit_with_no_changes EXIT
-
 
 ###############################################################################
 # validate parent device
@@ -315,10 +309,16 @@ else
 fi
 
 # validate parent device identifier (must be entire device)
-(echo "$PARENT_DEVICE" | grep -Eq '^([hs]d[a-z]|disk[0-9]+|loop[0-9]+)$') || (echo "[-] <device> is of invalid form (invalid parent device)" >&2; false)
+(echo "$PARENT_DEVICE" | grep -Eq '^([hs]d[a-z]|disk[0-9]+|loop[0-9]+)$') || (
+    echo "[-] <device> is of invalid form (invalid parent device)" >&2
+    false
+)
 
 # verify parent is a device, not just a file
-[[ -b /dev/$PARENT_DEVICE ]] || (echo "[-] /dev/$PARENT_DEVICE either doesn't exist or is not block special" >&2; false)
+[[ -b /dev/$PARENT_DEVICE ]] || (
+    echo "[-] /dev/$PARENT_DEVICE either doesn't exist or is not block special" >&2
+    false
+)
 
 # validate configuration
 if [[ "$PARENT_DEVICE" != "$DEVICE" ]]; then
@@ -332,7 +332,7 @@ if [[ "$PARENT_DEVICE" != "$DEVICE" ]]; then
     echo "You are attempting to format a single partition (as opposed to entire device)."
     echo "For maximal compatibility, the recommendation is to format the entire device."
     echo "If you continue, the resultant UDF partition will not be recognized on macOS."
-    
+
     if [[ -z $FORCE ]]; then
         read -rp "Type 'yes' if you would like to continue anyway:  " YES_CASE
         YES=$(echo "$YES_CASE" | tr '[:upper:]' '[:lower:]')
@@ -342,35 +342,33 @@ if [[ "$PARENT_DEVICE" != "$DEVICE" ]]; then
     fi
 fi
 
-
 ###############################################################################
 # test dependencies
 ###############################################################################
 
 echo "[+] Testing dependencies..."
-if [[ ! -x $(which cat 2>/dev/null) ]] ||
-   [[ ! -x $(which grep 2>/dev/null) ]] ||
-   [[ ! -x $(which mount 2>/dev/null) ]] ||
-   [[ ! -x $(which test 2>/dev/null) ]] ||
-   [[ ! -x $(which true 2>/dev/null) ]] ||
-   [[ ! -x $(which false 2>/dev/null) ]] ||
-   [[ ! -x $(which awk 2>/dev/null) ]] ||
-   [[ ! -x $(which printf 2>/dev/null) ]] ||
-   [[ ! -x $(which sed 2>/dev/null) ]] ||
-   [[ ! -x $(which tr 2>/dev/null) ]] ||
-   [[ ! -x $(which dd 2>/dev/null) ]] ||
-   [[ ! -x $(which xxd 2>/dev/null) ]]; then
+if [[ ! -x $(which cat 2> /dev/null) ]] ||
+    [[ ! -x $(which grep 2> /dev/null) ]] ||
+    [[ ! -x $(which mount 2> /dev/null) ]] ||
+    [[ ! -x $(which test 2> /dev/null) ]] ||
+    [[ ! -x $(which true 2> /dev/null) ]] ||
+    [[ ! -x $(which false 2> /dev/null) ]] ||
+    [[ ! -x $(which awk 2> /dev/null) ]] ||
+    [[ ! -x $(which printf 2> /dev/null) ]] ||
+    [[ ! -x $(which sed 2> /dev/null) ]] ||
+    [[ ! -x $(which tr 2> /dev/null) ]] ||
+    [[ ! -x $(which dd 2> /dev/null) ]] ||
+    [[ ! -x $(which xxd 2> /dev/null) ]]; then
     echo "[-] Dependencies unmet.  Please verify that the following are installed, executable, and in the PATH:  cat, grep, mount, test, true, false, awk, printf, sed, tr, dd, xxd" >&2
     exit 1
 fi
 
-
 # ensure have required drive info tool
 echo -n "[+] Looking for drive info tool..."
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-TOOL_BLOCKDEV=$($SUDO which blockdev 2>/dev/null) || true
+TOOL_BLOCKDEV=$($SUDO which blockdev 2> /dev/null) || true
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-TOOL_IOREG=$(which ioreg 2>/dev/null) || true
+TOOL_IOREG=$(which ioreg 2> /dev/null) || true
 if [[ -x "$TOOL_BLOCKDEV" ]]; then
     TOOL_DRIVE_INFO=$TOOL_BLOCKDEV
 elif [[ -x "$TOOL_IOREG" ]]; then
@@ -382,13 +380,12 @@ else
 fi
 echo " using $TOOL_DRIVE_INFO"
 
-
 # ensure have required drive listing tool
 echo -n "[+] Looking for drive listing tool..."
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-TOOL_BLOCKDEV=$($SUDO which blockdev 2>/dev/null) || true
+TOOL_BLOCKDEV=$($SUDO which blockdev 2> /dev/null) || true
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-TOOL_DISKUTIL=$(which diskutil 2>/dev/null) || true
+TOOL_DISKUTIL=$(which diskutil 2> /dev/null) || true
 if [[ -x "$TOOL_BLOCKDEV" ]]; then
     TOOL_DRIVE_LISTING=$TOOL_BLOCKDEV
 elif [[ -x "$TOOL_DISKUTIL" ]]; then
@@ -400,11 +397,10 @@ else
 fi
 echo " using $TOOL_DRIVE_LISTING"
 
-
 # ensure have required drive summary tool
 echo -n "[+] Looking for drive summary tool..."
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-TOOL_BLKID=$($SUDO which blkid 2>/dev/null) || true
+TOOL_BLKID=$($SUDO which blkid 2> /dev/null) || true
 if [[ -x "$TOOL_BLKID" ]]; then
     TOOL_DRIVE_SUMMARY=$TOOL_BLKID
     echo " using $TOOL_DRIVE_SUMMARY"
@@ -413,13 +409,12 @@ else
     echo " using (none)"
 fi
 
-
 # ensure have required unmount tool
 echo -n "[+] Looking for unmount tool..."
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-TOOL_UMOUNT=$($SUDO which umount 2>/dev/null) || true
+TOOL_UMOUNT=$($SUDO which umount 2> /dev/null) || true
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-TOOL_DISKUTIL=$($SUDO which diskutil 2>/dev/null) || true
+TOOL_DISKUTIL=$($SUDO which diskutil 2> /dev/null) || true
 # prefer 'diskutil' if available, as it's required on macOS (even if 'umount' is present)
 if [[ -x "$TOOL_DISKUTIL" ]]; then
     TOOL_UNMOUNT=$TOOL_DISKUTIL
@@ -432,13 +427,12 @@ else
 fi
 echo " using $TOOL_UNMOUNT"
 
-
 # ensure have required UDF tool
 echo -n "[+] Looking for UDF tool..."
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-TOOL_MKUDFFS=$($SUDO which mkudffs 2>/dev/null) || true
+TOOL_MKUDFFS=$($SUDO which mkudffs 2> /dev/null) || true
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-TOOL_NEWFS_UDF=$($SUDO which newfs_udf 2>/dev/null) || true
+TOOL_NEWFS_UDF=$($SUDO which newfs_udf 2> /dev/null) || true
 if [[ -x "$TOOL_MKUDFFS" ]]; then
     TOOL_UDF=$TOOL_MKUDFFS
 elif [[ -x "$TOOL_NEWFS_UDF" ]]; then
@@ -449,7 +443,6 @@ else
     exit 1
 fi
 echo " using $TOOL_UDF"
-
 
 ###############################################################################
 # gather information - logical block size
@@ -469,10 +462,18 @@ echo "[*] Detected logical block size of $LOGICAL_BLOCK_SIZE"
 
 # validate that $LOGICAL_BLOCK_SIZE is numeric > 0 and multiple of 512
 echo "[+] Validating detected logical block size..."
-(echo "$LOGICAL_BLOCK_SIZE" | grep -Eq '^[0-9]+$') || (echo "[-] Could not detect logical block size" >&2; false)
-[[ $LOGICAL_BLOCK_SIZE -gt 0 ]] || (echo "[-] Could not detect logical block size" >&2; false)
-[[ $((LOGICAL_BLOCK_SIZE % 512)) -eq 0 ]] || (echo "[-] Could not detect logical block size" >&2; false)
-
+(echo "$LOGICAL_BLOCK_SIZE" | grep -Eq '^[0-9]+$') || (
+    echo "[-] Could not detect logical block size" >&2
+    false
+)
+[[ $LOGICAL_BLOCK_SIZE -gt 0 ]] || (
+    echo "[-] Could not detect logical block size" >&2
+    false
+)
+[[ $((LOGICAL_BLOCK_SIZE % 512)) -eq 0 ]] || (
+    echo "[-] Could not detect logical block size" >&2
+    false
+)
 
 ###############################################################################
 # gather information - physical block size
@@ -495,10 +496,18 @@ if [[ -n $PHYSICAL_BLOCK_SIZE ]]; then
 
     # validate that $PHYSICAL_BLOCK_SIZE is numeric > 0 and multiple of 512
     echo "[+] Validating detected physical block size..."
-    (echo "$PHYSICAL_BLOCK_SIZE" | grep -Eq '^[0-9]+$') || (echo "[-] Could not detect physical block size" >&2; false)
-    [[ $PHYSICAL_BLOCK_SIZE -gt 0 ]] || (echo "[-] Could not detect physical block size" >&2; false)
-    [[ $((PHYSICAL_BLOCK_SIZE % 512)) -eq 0 ]] || (echo "[-] Could not detect physical block size" >&2; false)
-
+    (echo "$PHYSICAL_BLOCK_SIZE" | grep -Eq '^[0-9]+$') || (
+        echo "[-] Could not detect physical block size" >&2
+        false
+    )
+    [[ $PHYSICAL_BLOCK_SIZE -gt 0 ]] || (
+        echo "[-] Could not detect physical block size" >&2
+        false
+    )
+    [[ $((PHYSICAL_BLOCK_SIZE % 512)) -eq 0 ]] || (
+        echo "[-] Could not detect physical block size" >&2
+        false
+    )
 
     ###############################################################################
     # check for Advanced Format drive
@@ -509,14 +518,14 @@ if [[ -n $PHYSICAL_BLOCK_SIZE ]]; then
         echo "of $LOGICAL_BLOCK_SIZE bytes and physical block size of $PHYSICAL_BLOCK_SIZE bytes."
         if [[ $LOGICAL_BLOCK_SIZE -eq 512 ]] && [[ $PHYSICAL_BLOCK_SIZE -eq 4096 ]]; then
             echo "This device is an '512 emulation' (512e) drive."
-        elif [[ $LOGICAL_BLOCK_SIZE -eq 4096 ]] && [[ $PHYSICAL_BLOCK_SIZE -eq 4096 ]]; then 
+        elif [[ $LOGICAL_BLOCK_SIZE -eq 4096 ]] && [[ $PHYSICAL_BLOCK_SIZE -eq 4096 ]]; then
             echo "This device is an '4K native' (4Kn) drive."
         fi
         echo "As such, this drive will not be as compatible across operating systems as a standard"
         echo "drive having a logical block size of 512 bytes and a physical block size of 512 bytes."
         echo "For example, this drive will not be usable for read or write on Windows XP."
         echo "Please see the format-udf README for more information/limitations."
-        
+
         if [[ -z $FORCE ]]; then
             read -rp "Type 'yes' if you would like to continue anyway:  " YES_CASE
             YES=$(echo "$YES_CASE" | tr '[:upper:]' '[:lower:]')
@@ -526,7 +535,6 @@ if [[ -n $PHYSICAL_BLOCK_SIZE ]]; then
         fi
     fi
 fi
-
 
 ###############################################################################
 # choose file system block size
@@ -542,12 +550,20 @@ fi
 
 # validate that $FILE_SYSTEM_BLOCK_SIZE is numeric > 0 and multiple of 512
 echo "[+] Validating file system block size..."
-(echo "$FILE_SYSTEM_BLOCK_SIZE" | grep -Eq '^[0-9]+$') || (echo "[-] Invalid file system block size" >&2; false)
-[[ $FILE_SYSTEM_BLOCK_SIZE -gt 0 ]] || (echo "[-] Invalid file system block size" >&2; false)
-[[ $((FILE_SYSTEM_BLOCK_SIZE % 512)) -eq 0 ]] || (echo "[-] Invalid file system block size" >&2; false)
+(echo "$FILE_SYSTEM_BLOCK_SIZE" | grep -Eq '^[0-9]+$') || (
+    echo "[-] Invalid file system block size" >&2
+    false
+)
+[[ $FILE_SYSTEM_BLOCK_SIZE -gt 0 ]] || (
+    echo "[-] Invalid file system block size" >&2
+    false
+)
+[[ $((FILE_SYSTEM_BLOCK_SIZE % 512)) -eq 0 ]] || (
+    echo "[-] Invalid file system block size" >&2
+    false
+)
 
 echo "[*] Using file system block size of $FILE_SYSTEM_BLOCK_SIZE"
-
 
 ###############################################################################
 # gather information - total size
@@ -567,17 +583,23 @@ echo "[*] Detected total size of $TOTAL_SIZE"
 
 # validate that $TOTAL_SIZE is numeric > 0
 echo "[+] Validating detected total size..."
-(echo "$TOTAL_SIZE" | grep -Eq '^[0-9]+$') || (echo "[-] Could not detect valid total size" >&2; false)
-[[ $TOTAL_SIZE -gt 0 ]] || (echo "[-] Could not detect valid total size" >&2; false)
+(echo "$TOTAL_SIZE" | grep -Eq '^[0-9]+$') || (
+    echo "[-] Could not detect valid total size" >&2
+    false
+)
+[[ $TOTAL_SIZE -gt 0 ]] || (
+    echo "[-] Could not detect valid total size" >&2
+    false
+)
 
 # verify entire drive capacity can be used
-if [[ $((TOTAL_SIZE/LOGICAL_BLOCK_SIZE)) -ge $(((2**32)-1)) ]]; then
+if [[ $((TOTAL_SIZE / LOGICAL_BLOCK_SIZE)) -ge $(((2 ** 32) - 1)) ]]; then
     echo "The device you have selected is larger than can be fully utilized by UDF."
     echo "Only the first 2^32 logical blocks on the device will be usable on the resultant UDF drive,"
     echo "and the remainder of the drive will not be used."
-    echo "The maximum UDF file system capacity on this device is $((LOGICAL_BLOCK_SIZE/256)) TiB."
+    echo "The maximum UDF file system capacity on this device is $((LOGICAL_BLOCK_SIZE / 256)) TiB."
     echo "Please see the format-udf README for more information."
-    
+
     if [[ -z $FORCE ]]; then
         read -rp "Type 'yes' if you would like to continue anyway:  " YES_CASE
         YES=$(echo "$YES_CASE" | tr '[:upper:]' '[:lower:]')
@@ -586,7 +608,6 @@ if [[ $((TOTAL_SIZE/LOGICAL_BLOCK_SIZE)) -ge $(((2**32)-1)) ]]; then
         fi
     fi
 fi
-
 
 ###############################################################################
 # user's last chance before the drive is modified
@@ -606,14 +627,13 @@ fi
 
 if [[ -z $FORCE ]]; then
     echo "The above-listed device (and partitions, if any) will be completely erased."
-    
+
     read -rp "Type 'yes' if this is what you intend:  " YES_CASE
     YES=$(echo "$YES_CASE" | tr '[:upper:]' '[:lower:]')
     if [[ $YES != "yes" ]]; then
         exit 1
     fi
 fi
-
 
 ###############################################################################
 # unmount device (if mounted)
@@ -631,7 +651,6 @@ else
     exit 1
 fi
 
-
 ###############################################################################
 # optionally wipe device
 ###############################################################################
@@ -640,23 +659,22 @@ fi
 trap - EXIT
 
 case $WIPE_METHOD in
-    quick)
-        # nothing to do
-        ;;
-    zero)
-        echo "[+] Overwriting device with zeros.  This will likely take a LONG time..."
-        $SUDO dd if=/dev/zero of="/dev/$DEVICE" bs="$LOGICAL_BLOCK_SIZE" || true
-        ;;
-    scrub)
-        echo "[+] Scrubbing device with random patterns.  This will likely take a LONG time..."
-        $SUDO scrub -f "/dev/$DEVICE"
-        ;;
-    *)
-        echo "[-] Internal error 6" >&2
-        exit 1
-        ;;
+quick)
+    # nothing to do
+    ;;
+zero)
+    echo "[+] Overwriting device with zeros.  This will likely take a LONG time..."
+    $SUDO dd if=/dev/zero of="/dev/$DEVICE" bs="$LOGICAL_BLOCK_SIZE" || true
+    ;;
+scrub)
+    echo "[+] Scrubbing device with random patterns.  This will likely take a LONG time..."
+    $SUDO scrub -f "/dev/$DEVICE"
+    ;;
+*)
+    echo "[-] Internal error 6" >&2
+    exit 1
+    ;;
 esac
-
 
 ###############################################################################
 # zero out partition table (required even without fake partition table)
@@ -665,7 +683,6 @@ esac
 echo "[+] Zeroing out first chunk of device..."
 # 4096 was arbitrarily chosen to be "big enough" to delete first chunk of device
 $SUDO dd if=/dev/zero of="/dev/$DEVICE" bs="$LOGICAL_BLOCK_SIZE" count=4096
-
 
 ###############################################################################
 # format device
@@ -679,7 +696,10 @@ if [[ $TOOL_UDF = "$TOOL_MKUDFFS" ]]; then
     # --lvid       - logical volume identifier
     # --vid        - volume identifier
     # --media-type - "hd" type covers both hard drives and USB drives
-    ($SUDO mkudffs --utf8 --blocksize="$FILE_SYSTEM_BLOCK_SIZE" --media-type=hd --udfrev=0x0201 --lvid="$LABEL" --vid="$LABEL" "/dev/$DEVICE") || (echo "[-] Format failed!" >&2; false)
+    ($SUDO mkudffs --utf8 --blocksize="$FILE_SYSTEM_BLOCK_SIZE" --media-type=hd --udfrev=0x0201 --lvid="$LABEL" --vid="$LABEL" "/dev/$DEVICE") || (
+        echo "[-] Format failed!" >&2
+        false
+    )
 elif [[ $TOOL_UDF = "$TOOL_NEWFS_UDF" ]]; then
     # -b    - the size of blocks in bytes. should be the same as the drive's physical block size.
     # -m    - "blk" type covers both hard drives and USB drives
@@ -687,34 +707,35 @@ elif [[ $TOOL_UDF = "$TOOL_NEWFS_UDF" ]]; then
     # -r    - the udf revision to use.  2.01 is the latest revision available that supports writing in Linux.
     # -v    - volume identifier
     # --enc - encode volume name in UTF8
-    ($SUDO newfs_udf -b "$FILE_SYSTEM_BLOCK_SIZE" -m blk -t ow -r 2.01 -v "$LABEL" --enc utf8 "/dev/$DEVICE") || (echo "[-] Format failed!" >&2; false)
+    ($SUDO newfs_udf -b "$FILE_SYSTEM_BLOCK_SIZE" -m blk -t ow -r 2.01 -v "$LABEL" --enc utf8 "/dev/$DEVICE") || (
+        echo "[-] Format failed!" >&2
+        false
+    )
 else
     echo "[-] Internal error 7" >&2
     exit 1
 fi
-
 
 ###############################################################################
 # write fake partition table (for added compatibility on Windows)
 ###############################################################################
 
 case $PARTITION_TYPE in
-    none)
-        # nothing to do
-        ;;
-    mbr)
-        echo "[+] Writing fake MBR..."
-        # first block has already been zero'd.  start by writing the (only) partition entry at its correct offset.
-        entire_disk_partition_entry "$TOTAL_SIZE" "$LOGICAL_BLOCK_SIZE" | xxd -r -p | $SUDO dd of="/dev/$DEVICE" bs=1 seek=446 count=16
-        # Boot signature at the end of the block
-        echo -n 55aa | xxd -r -p | $SUDO dd of="/dev/$DEVICE" bs=1 seek=510 count=2
-        ;;
-    *)
-        echo "[-] Internal error 8" >&2
-        exit 1
-        ;;
+none)
+    # nothing to do
+    ;;
+mbr)
+    echo "[+] Writing fake MBR..."
+    # first block has already been zero'd.  start by writing the (only) partition entry at its correct offset.
+    entire_disk_partition_entry "$TOTAL_SIZE" "$LOGICAL_BLOCK_SIZE" | xxd -r -p | $SUDO dd of="/dev/$DEVICE" bs=1 seek=446 count=16
+    # Boot signature at the end of the block
+    echo -n 55aa | xxd -r -p | $SUDO dd of="/dev/$DEVICE" bs=1 seek=510 count=2
+    ;;
+*)
+    echo "[-] Internal error 8" >&2
+    exit 1
+    ;;
 esac
-
 
 ###############################################################################
 # report status
@@ -722,7 +743,7 @@ esac
 
 # following call to blkid sometimes exits with failure, even though the device is formatted properly.
 # `true` is so that a failure here doesn't cause entire script to exit prematurely
-SUMMARY=$([[ $TOOL_DRIVE_SUMMARY = "$TOOL_BLKID" ]] && $SUDO blkid -c /dev/null "/dev/$DEVICE" 2>/dev/null) || true
+SUMMARY=$([[ $TOOL_DRIVE_SUMMARY = "$TOOL_BLKID" ]] && $SUDO blkid -c /dev/null "/dev/$DEVICE" 2> /dev/null) || true
 echo "[+] Successfully formatted $SUMMARY"
 
 # TODO find a way to auto-mount (`$SUDO mount -a` doesn't work).  in the meantime...
