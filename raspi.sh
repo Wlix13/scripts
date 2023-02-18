@@ -6,6 +6,7 @@ adduser $USERNAME
 
 # Install basics
 apt update
+apt upgrade
 apt install sudo wpasupplicant -y
 usermod -aG sudo $USERNAME
 

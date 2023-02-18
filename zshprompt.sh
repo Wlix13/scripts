@@ -2,6 +2,7 @@
 
 # Install ZSH prompt
 sudo apt update
+sudo apt upgrade
 sudo apt install zsh wget curl -y
 
 sudo usermod -s /usr/bin/zsh $(whoami)
@@ -12,6 +13,7 @@ curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools
 
 # Install Starship
 curl -fsSL https://starship.rs/install.sh | sh
+sed -i "s/ZSH_THEME=/#ZSH_THEME=/" test
 
 # Add support for FiraCode Nerd Font
 sudo apt install fontconfig -y
@@ -31,10 +33,9 @@ sed -i "s/plugins=(git)/plugins=(\ngit\nzsh-autosuggestions\n)/" ~/.zshrc
 
 # Add to .zshrc
 echo 'eval "$(starship init zsh)"' >> ~/.zshrc
-echo 'alias ls="ls -all"' >> ~/.zshrc
 
 # Install optional tools
-sudo apt install tmux mc locales gcc g++ ssh-keygen -y
+sudo apt install tmux mc locales gcc g++ -y
 
 # Configure locales
 sudo dpkg-reconfigure locales

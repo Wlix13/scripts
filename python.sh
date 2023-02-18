@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-export SRC_URL="https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tgz"
+export SRC_URL="https://www.python.org/ftp/python/3.11.2/Python-3.11.2.tgz"
 
 # Install dependencies
 sudo apt update
