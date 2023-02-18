@@ -13,13 +13,13 @@ curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools
 
 # Install Starship
 curl -fsSL https://starship.rs/install.sh | sh
-sed -i "s/ZSH_THEME=/#ZSH_THEME=/" test
+sed -i "s/ZSH_THEME=/#ZSH_THEME=/" ~/.zshrc
 
 # Add support for FiraCode Nerd Font
-sudo apt install fontconfig -y
+sudo apt install fontconfig unzip -y
 export SRC_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/v2.3.3/FiraCode.zip"
-wget -q $SRC_URL -O /tmp/FiraCode.zip
-unzip /tmp/FiraCode.zip -d ~/.local/share/fonts && rm /tmp/FiraCode.zip
+wget -q $SRC_URL -O ~/FiraCode.zip
+unzip ~/FiraCode.zip -d ~/.local/share/fonts && rm -rf ~/FiraCode.zip
 fc-cache -fv
 
 # Install Nerd Font Symbols Preset
