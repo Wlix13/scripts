@@ -2,17 +2,18 @@
 
 # Install ZSH prompt
 sudo apt update
-sudo apt upgrade
-sudo apt install zsh wget curl unzip git locales fontconfig-y
+sudo apt upgrade -y
+sudo apt install zsh wget curl unzip git locales fontconfig -y
 
 sudo usermod -s /usr/bin/zsh $(whoami)
 echo $SHELL
+zsh
 
 # Install Oh-My-ZSH
 curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh
 
 # Install Starship
-curl -fsSL https://starship.rs/install.sh | sh
+curl -fsSL https://starship.rs/install.sh | sudo sh
 sed -i "s/ZSH_THEME=/#ZSH_THEME=/" ~/.zshrc
 
 # Add support for FiraCode Nerd Font

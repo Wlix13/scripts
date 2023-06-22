@@ -31,8 +31,8 @@ fi
 rm -rf ~/.config/nvim
 rm -rf ~/.local/share/nvim
 echo "alias vim='nvim'" >> ~/.zshrc
-git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1 && vim
-
+source ~/.zshrc
+git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1 && nvim
 
 # Fix cursor
 echo "-- Change cursor to original after exiting vim" >> ~/.config/nvim/init.lua
@@ -42,7 +42,7 @@ echo "    vim.api.nvim_command('set guicursor= | call chansend(v:stderr, \"\x1b[
 echo "  end" >> ~/.config/nvim/init.lua
 echo "})" >> ~/.config/nvim/init.lua
 
-
+# ----------------------------- #
 
 # Install tmux from source
 sudo apt install libevent-dev ncurses-dev build-essential bison pkg-config -y
@@ -55,6 +55,8 @@ rm -rf tmux-*
 
 # Install TPM(Tmux Plugin Manager)
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+mkdir ~/.config/tmux
+touch ~/.config/tmux/tmux.conf
 
 # Setup TPM config
 echo "# Support for colors and mouse" >> ~/.config/tmux/tmux.conf
@@ -76,3 +78,5 @@ echo "set -g @plugin 'tmux-plugins/tpm'" >> ~/.config/tmux/tmux.conf
 echo "set -g @plugin 'tmux-plugins/tmux-sensible'" >> ~/.config/tmux/tmux.conf
 echo "set -g @plugin 'janoamaral/tokyo-night-tmux'" >> ~/.config/tmux/tmux.conf
 echo "run '~/.tmux/plugins/tpm/tpm'" >> ~/.config/tmux/tmux.conf
+
+tmux source ~/.config/tmux/tmux.conf
