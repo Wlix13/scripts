@@ -79,4 +79,4 @@ echo "set -g @plugin 'tmux-plugins/tmux-sensible'" >> ~/.config/tmux/tmux.conf
 echo "set -g @plugin 'janoamaral/tokyo-night-tmux'" >> ~/.config/tmux/tmux.conf
 echo "run '~/.tmux/plugins/tpm/tpm'" >> ~/.config/tmux/tmux.conf
 
-tmux source ~/.config/tmux/tmux.conf
+echo "Done! Run 'tmux' to start tmux and press 'prefix + I' to install plugins."
