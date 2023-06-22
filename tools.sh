@@ -51,7 +51,7 @@ tar -zxf tmux-*.tar.gz && rm -f tmux-*.tar.gz
 cd tmux-*/
 ./configure
 make && sudo make install
-rm -rf tmux-* 
+cd .. && rm -rf tmux-*
 
 # Install TPM(Tmux Plugin Manager)
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm

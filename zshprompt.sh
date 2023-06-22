@@ -7,10 +7,10 @@ sudo apt install zsh wget curl unzip git locales fontconfig -y
 
 sudo usermod -s /usr/bin/zsh $(whoami)
 echo $SHELL
-zsh
 
 # Install Oh-My-ZSH
 curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh
+zsh && exit
 
 # Install Starship
 curl -fsSL https://starship.rs/install.sh | sudo sh
