@@ -2,7 +2,7 @@
 
 # Install-update basics
 sudo apt update && sudo apt upgrade -y
-sudo apt install sudo gcc g++ -y
+sudo apt install gcc g++ -y
 
 # Check for architecture
 if [ "$(uname -m)" = "x86_64" ]; then
@@ -21,6 +21,7 @@ elif [ "$(uname -m)" = "aarch64" ]; then
     sudo snap install core
     sudo snap install nvim --classic
     sudo ln -s /snap/bin/nvim /usr/bin/nvim
+    rm -rf snap
 else
     echo "Architecture: Unknown"
     echo "Exiting..."
@@ -41,6 +42,17 @@ echo "  callback = function()" >> ~/.config/nvim/init.lua
 echo "    vim.api.nvim_command('set guicursor= | call chansend(v:stderr, \"\x1b[ q\")')" >> ~/.config/nvim/init.lua
 echo "  end" >> ~/.config/nvim/init.lua
 echo "})" >> ~/.config/nvim/init.lua
+
+# Add plugins
+sed -i "s/local M = {}/local M = {}\n M.plugins = 'custom.plugins'/" ~/.config/nvim/lua/custom/chadrc.lua
+touch ~/.config/nvim/lua/custom/plugins.lua
+echo "local plugins = {" >> ~/.config/nvim/lua/custom/plugins.lua
+echo "{\"lambdalisue/suda.vim\", lazy = false}" >> ~/.config/nvim/lua/custom/plugins.lua
+echo "}" >> ~/.config/nvim/lua/custom/plugins.lua
+echo "return plugins" >> ~/.config/nvim/lua/custom/plugins.lua
+
+echo "--- Plugins options ---" >> ~/.config/nvim/lua/core/init.lua
+echo "g.suda_smart_edit = 1" >> ~/.config/nvim/lua/core/init.lua
 
 # ----------------------------- #
 
