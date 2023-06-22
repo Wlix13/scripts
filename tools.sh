@@ -4,6 +4,9 @@
 sudo apt update && sudo apt upgrade -y
 sudo apt install gcc g++ -y
 
+# Set timezone
+sudo timedatectl set-timezone Europe/Moscow
+
 # Check for architecture
 if [ "$(uname -m)" = "x86_64" ]; then
     echo "Architecture: x86_64"
