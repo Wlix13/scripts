@@ -4,7 +4,7 @@ export SRC_URL="https://www.python.org/ftp/python/3.11.4/Python-3.11.4.tgz"
 
 # Install dependencies
 sudo apt update
-sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev libbz2-dev libbluetooth-dev -y
+sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev libbz2-dev liblzma-dev libbluetooth-dev -y
 
 # Download Python
 wget -q -O- $SRC_URL | tar -xz
@@ -19,6 +19,7 @@ fi
 
 # Install Python
 sudo make install
+python3 -m pip install --upgrade pip
 
 # Remove old Python
 sudo apt remove python3 -y && sudo apt autoremove -y
