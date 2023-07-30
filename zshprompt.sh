@@ -3,7 +3,7 @@
 # Install ZSH prompt
 sudo apt update
 sudo apt upgrade -y
-sudo apt install zsh wget curl unzip git locales fontconfig -y
+sudo apt install zsh wget curl unzip git locales fontconfig toilet -y
 
 sudo usermod -s /usr/bin/zsh $(whoami)
 
