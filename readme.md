@@ -27,7 +27,7 @@ This repository contains scripts which I use to automate installing and configur
 4) [tools.sh](#tools) - Install different tools with preconfigured settings
 5) [python.sh](#python) - Compile and install python 3.11.* from source
 6) [raspi.sh](#raspi) - Automatically configure Raspberry Pi
-
+7) [serverinfo.sh](#serverinfo) - Get information about server on login
 
 ## <center>Scripts description:</center>
 
@@ -50,6 +50,13 @@ This repository contains scripts which I use to automate installing and configur
     - Create user and add it to sudo group
     - Create wpa_supplicant config file
     - Create Wi-Fi services 
+
+### Serverinfo:
+    - Uptime
+    - Memory usage
+    - Disk usage
+    - Get information about running services(set in script)
+    - Docker containers status
 
 ### Issue cert:
     - Create a self-signed certificate for local development
