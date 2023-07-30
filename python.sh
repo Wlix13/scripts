@@ -28,3 +28,4 @@ cd .. && sudo rm -rf Python-3.*
 # Make aliases
 echo 'alias python="python3"' >> ~/.zshrc
 echo 'alias pip="python3 -m pip"' >> ~/.zshrc
+source ~/.zshrc
