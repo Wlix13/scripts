@@ -13,11 +13,12 @@ free_memory=$(free -m | awk 'NR==2{printf "Memory Usage: %sMB / %sMB (%.2f%%)\n"
 disk_usage=$(df -h / | grep "G" | awk {'print "Disk Usage: ",$3,"/",$2,"("$5")"'})
 
 # Services:
-serv1="apache2"
+serv1="ssh"
 # serv2="postgres"
 
 # Docker containers:
 # container1="mongodb"
+# container2="linkwarden"
 
 # OS info
 [ -f /usr/bin/toilet ] && toilet -f mono12 -F metal -w 120 $TITLE || echo -e "$GREEN====== $TITLE ($HOSTIP) ======$BLACK"
@@ -31,4 +32,6 @@ echo -e "\nServices Status: "
 # [ "$(systemctl list-units --type=service --state=running | grep $serv2)" ] && echo -e "[$GREEN OK $BLACK] $serv2" || echo -e "[$RED FAIL $BLACK] $serv2"
 
 # If docker containers
-# [ "$(docker ps | grep $container1)" ] && echo -e "$[$GREEN OK $BLACK] $container1" || echo -e "[$RED FAIL $BLACK] $container1"
+# echo -e "\nDocker containers: "
+# [ "$(docker ps | grep $container1)" ] && echo -e "[$GREEN OK $BLACK] $container1" || echo -e "[$RED FAIL $BLACK] $container1"
+# [ "$(docker ps | grep $container2)" ] && echo -e "[$GREEN OK $BLACK] $container2" || echo -e "[$RED FAIL $BLACK] $container2"
