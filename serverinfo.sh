@@ -11,6 +11,7 @@ HOSTIP=$(hostname -I | awk {'print $1'})
 uptime=$(uptime | awk -F'( |,|:)+' '{d=h=m=0; if ($7=="min") m=$6; else {if ($7~/^day/) {d=$6;h=$8;m=$9} else {h=$6;m=$7}}} {print d+0,"days",h+0,"hours"}')
 free_memory=$(free -m | awk 'NR==2{printf "Memory Usage: %sMB / %sMB (%.2f%%)\n", $3,$2,$3*100/$2}')
 disk_usage=$(df -h / | grep "G" | awk {'print "Disk Usage: ",$3,"/",$2,"("$5")"'})
+load_average=$(uptime | awk -F 'load average: ' '{print "Load Average: " $2}')
 
 # Services:
 serv1="ssh"
@@ -25,6 +26,7 @@ serv1="ssh"
 echo "Uptime: $uptime"
 echo $free_memory
 echo $disk_usage
+echo $load_average
 
 # Check services status
 echo -e "\nServices Status: "
