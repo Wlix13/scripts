@@ -31,7 +31,7 @@ else
     exit 1
 fi
 
-# Setup NeoVIM Chad
+# Setup NvChad
 rm -rf ~/.config/nvim
 rm -rf ~/.local/share/nvim
 echo "alias vim='nvim'" >> ~/.zshrc
@@ -39,20 +39,12 @@ source ~/.zshrc
 git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1 && nvim
 
 # Fix cursor
-echo "-- Change cursor to original after exiting vim" >> ~/.config/nvim/init.lua
-echo "vim.api.nvim_create_autocmd(\"VimLeave\", {" >> ~/.config/nvim/init.lua
-echo "  callback = function()" >> ~/.config/nvim/init.lua
-echo "    vim.api.nvim_command('set guicursor= | call chansend(v:stderr, \"\x1b[ q\")')" >> ~/.config/nvim/init.lua
-echo "  end" >> ~/.config/nvim/init.lua
-echo "})" >> ~/.config/nvim/init.lua
+echo "" >> ~/.config/nvim/init.lua
+cat ./configs/nvim/init.lua >> ~/.config/nvim/init.lua
 
-# Add plugins
+# Add plugins support
 sed -i "s/local M = {}/local M = {}\n M.plugins = 'custom.plugins'/" ~/.config/nvim/lua/custom/chadrc.lua
-touch ~/.config/nvim/lua/custom/plugins.lua
-echo "local plugins = {" >> ~/.config/nvim/lua/custom/plugins.lua
-echo "{\"lambdalisue/suda.vim\", lazy = false}" >> ~/.config/nvim/lua/custom/plugins.lua
-echo "}" >> ~/.config/nvim/lua/custom/plugins.lua
-echo "return plugins" >> ~/.config/nvim/lua/custom/plugins.lua
+cp ./configs/nvim/plugins.lua ~/.config/nvim/lua/custom/plugins.lua
 
 echo "--- Plugins options ---" >> ~/.config/nvim/lua/core/init.lua
 echo "g.suda_smart_edit = 1" >> ~/.config/nvim/lua/core/init.lua
@@ -74,24 +66,6 @@ mkdir ~/.config/tmux
 touch ~/.config/tmux/tmux.conf
 
 # Setup TPM config
-echo "# Support for colors and mouse" >> ~/.config/tmux/tmux.conf
-echo "set-option -sa terminal-overrides \",xterm*:Tc\"" >> ~/.config/tmux/tmux.conf
-echo "set -g mouse on" >> ~/.config/tmux/tmux.conf
-echo "# Shift Alt vim keys to switch windows" >> ~/.config/tmux/tmux.conf
-echo "bind -n M-H previous-window" >> ~/.config/tmux/tmux.conf
-echo "bind -n M-L next-window" >> ~/.config/tmux/tmux.conf
-echo "# Start windows and panes at 1, not 0" >> ~/.config/tmux/tmux.conf
-echo "set -g base-index 1" >> ~/.config/tmux/tmux.conf
-echo "set -g pane-base-index 1" >> ~/.config/tmux/tmux.conf
-echo "set-window-option -g pane-base-index 1" >> ~/.config/tmux/tmux.conf
-echo "set-option -g renumber-windows on" >> ~/.config/tmux/tmux.conf
-echo "# Open pane in same directory" >> ~/.config/tmux/tmux.conf
-echo "bind '\"' split-window -v -c \"#{pane_current_path}\"" >> ~/.config/tmux/tmux.conf
-echo "bind % split-window -h -c \"#{pane_current_path}\"" >> ~/.config/tmux/tmux.conf
-echo "# Plugins" >> ~/.config/tmux/tmux.conf
-echo "set -g @plugin 'tmux-plugins/tpm'" >> ~/.config/tmux/tmux.conf
-echo "set -g @plugin 'tmux-plugins/tmux-sensible'" >> ~/.config/tmux/tmux.conf
-echo "set -g @plugin 'janoamaral/tokyo-night-tmux'" >> ~/.config/tmux/tmux.conf
-echo "run '~/.tmux/plugins/tpm/tpm'" >> ~/.config/tmux/tmux.conf
+cp ./configs/tmux/tmux.conf ~/.config/tmux/tmux.conf
 
 echo "Done! Run 'tmux' to start tmux and press 'prefix + I' to install plugins."
