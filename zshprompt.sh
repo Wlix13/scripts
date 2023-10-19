@@ -1,9 +1,8 @@
 #!/usr/bin/env sh
 
 # Install ZSH prompt
-sudo apt update
-sudo apt upgrade -y
-sudo apt install zsh wget curl unzip git locales fontconfig toilet screenfetch -y
+sudo apt update && sudo apt upgrade -y
+sudo apt install zsh wget curl unzip git locales fontconfig -y
 
 sudo usermod -s /usr/bin/zsh $(whoami)
 
@@ -15,13 +14,13 @@ zsh && exit
 curl -fsSL https://starship.rs/install.sh | sudo sh
 sed -i "s/ZSH_THEME=/#ZSH_THEME=/" ~/.zshrc
 
-# Add to .zshrc
-echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+# Install additional tools
+apt install zoxide toilet screenfetch -y
 
 # Add support for FiraCode Nerd Font
 fonts_dir="~/.local/share/fonts"
 if [ ! -d "${fonts_dir}" ]; then
-    mkdir -p "${fonts_dir}"
+    mkdir -p "${fonts_dir}" 
 fi
 version=6.2
 zip=Fira_Code_v${version}.zip
@@ -36,6 +35,11 @@ wget https://starship.rs/presets/toml/nerd-font-symbols.toml -O ~/.config/starsh
 # Install zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 sed -i "s/plugins=(git)/plugins=(\ngit\nzsh-autosuggestions\n)/" ~/.zshrc
+
+# Add to .zshrc
+echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+echo 'eval "$(zoxide init zsh)"' >> ~/.zshrc
+source ~/.zshrc:q
 
 # Configure locales
 sudo dpkg-reconfigure locales
