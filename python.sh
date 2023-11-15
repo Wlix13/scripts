@@ -21,8 +21,7 @@ fi
 sudo make install
 python3 -m pip install --upgrade pip
 
-# Remove old Python
-sudo apt remove python3 -y && sudo apt autoremove -y
+# Clean up
 cd .. && sudo rm -rf Python-3.*
 
 # Make aliases
