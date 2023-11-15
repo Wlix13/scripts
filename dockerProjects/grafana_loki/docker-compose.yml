@@ -3,6 +3,7 @@ version: "3"
 services:
   promtail:
     container_name: promtail
+    restart: unless-stopped
     image: grafana/promtail:latest
     volumes:
       - /var/log:/var/log
@@ -13,6 +14,7 @@ services:
 
   loki:
     container_name: loki
+    restart: unless-stopped
     image: grafana/loki:latest
     ports:
       - "9677:3100"
@@ -22,6 +24,7 @@ services:
 
   grafana:
     container_name: grafana
+    restart: unless-stopped
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_AUTH_ANONYMOUS_ENABLED=true
