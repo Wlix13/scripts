@@ -18,16 +18,15 @@
 </p>
 
 # About
-This repository contains scripts which I use to automate installing and configuring my systems. I use them to configure my personal computers, servers and Raspberry Pi. I hope you will find them useful.
+This repository contains scripts which I use to automate installing and configuring my systems. I use them to configure my personal computers, servers, and Raspberry Pi. I hope you will find them useful.
 
 ## Scripts list:
 1) [issue-cert.ps1](#issue-cert) - Issue OpenSSL certificate for local
-2) [format-udf.sh](#format-udf) - Format USB drive to UDF
-3) [zshprompt.sh](#zshprompt) - Installs starship prompt
-4) [tools.sh](#tools) - Install different tools with preconfigured settings
-5) [python.sh](#python) - Compile and install python 3.11.* from source
-6) [raspi.sh](#raspi) - Automatically configure Raspberry Pi
-7) [serverinfo.sh](#serverinfo) - Get information about server on login
+2) [zshprompt.sh](#zshprompt) - Installs starship prompt
+3) [tools.sh](#tools) - Install different tools with preconfigured settings
+4) [python.sh](#python) - Compile and install python 3.11.* from source
+5) [raspi.sh](#raspi) - Automatically configure Raspberry Pi
+6) [serverinfo.sh](#serverinfo) - Get information about server on login
 
 ## <center>Scripts description:</center>
 
@@ -61,8 +60,6 @@ This repository contains scripts which I use to automate installing and configur
 ### Issue cert:
     - Create a self-signed certificate for local development
 
-### Format UDF:
-    - Format USB drive to UDF format
 
 ## Usage
 
@@ -71,7 +68,3 @@ Don't hesitate to use these scripts. You can use them as you wish. If you have a
 ## Contributing
 
 If you want to contribute to this repository, please contact me. I will be glad to see your pull requests.
-
-## License
-
-This repository and its contents are licensed under the [MIT License](https://opensource.org/licenses/MIT).
