@@ -31,12 +31,14 @@ This repository contains scripts which I use to automate installing and configur
 ## <center>Scripts description:</center>
 
 ### Zshprompt:
-    - Install ZSH as default shell
-    - Install Oh-My-ZSH framework
-    - Install zsh-autosuggestions plugin
+    - Install zsh as default shell
+    - Install Oh My Zsh framework and plugins
     - Install Starship prompt
-    - Install Nerd Font Symbols Preset
-    - FiraCode Nerd Font support
+    - Install Nerd Font Symbols Preset and FiraCode Nerd Font
+    - Install additional tools:
+      - zoxide
+      - direnv 
+      - screenfetch
     - Configure locales
  
 ### Python:
