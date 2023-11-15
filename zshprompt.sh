@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Install ZSH prompt
-sudo apt update && sudo apt upgrade -y
+sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y && sudo apt autoclean -y
 sudo apt install zsh wget curl unzip git locales fontconfig -y
 
 sudo usermod -s /usr/bin/zsh $(whoami)
@@ -15,12 +15,16 @@ curl -fsSL https://starship.rs/install.sh | sudo sh
 sed -i "s/ZSH_THEME=/#ZSH_THEME=/" ~/.zshrc
 
 # Install additional tools
-apt install zoxide toilet screenfetch -y
+apt install zoxide toilet screenfetch direnv -y
+
+# Config for direnv to load dotenv files
+mkdir -p ~/.config/direnv
+cp ./configs/direnv/direnv.toml ~/.config/direnv/direnv.toml
 
 # Add support for FiraCode Nerd Font
 fonts_dir="~/.local/share/fonts"
 if [ ! -d "${fonts_dir}" ]; then
-    mkdir -p "${fonts_dir}" 
+    mkdir -p "${fonts_dir}"
 fi
 version=6.2
 zip=Fira_Code_v${version}.zip
@@ -39,7 +43,8 @@ sed -i "s/plugins=(git)/plugins=(\ngit\nzsh-autosuggestions\n)/" ~/.zshrc
 # Add to .zshrc
 echo 'eval "$(starship init zsh)"' >> ~/.zshrc
 echo 'eval "$(zoxide init zsh)"' >> ~/.zshrc
-source ~/.zshrc:q
+echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
+source ~/.zshrc
 
 # Configure locales
 sudo dpkg-reconfigure locales
