@@ -10,7 +10,6 @@ function New-Alias {
     }
 }
 
-
 function Set-Location {
     $argsPassed = $args
 
@@ -27,6 +26,18 @@ function Set-Location {
 function Get-TimePythonScript {
     param([string]$scriptName)
     Measure-Command { start-process python -ArgumentList $scriptName -Wait }
+}
+
+function Optimize-Git {
+    Get-ChildItem -Directory -Force | ForEach-Object { 
+        if (Test-Path "$($_.FullName)\.git") {
+            Write-Host "`n■ Pulling $_ ↓" -ForegroundColor Green | git -C $_.FullName pull --all --verbose 
+            Write-Host "`n■ Optimizing $_ ↓" -ForegroundColor Green | git -C $_.FullName gc --aggressive --prune=all
+        }
+        else {
+            Write-Host "`n■ Skipping $_ ↓" -ForegroundColor Yellow
+        }
+    }
 }
 
 function ConvertTo-PDF {

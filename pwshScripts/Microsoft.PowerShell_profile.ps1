@@ -27,6 +27,7 @@ New-Alias vim nvim
 New-Alias grep Select-String
 New-Alias time Get-TimePythonScript
 New-Alias makepdf ConvertTo-PDF
+New-Alias pullall Optimize-Git
 
 # ---
 # OS-specific settings
