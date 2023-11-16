@@ -48,7 +48,11 @@ This repository contains scripts which I use to automate installing and configur
      - direnv 
      - screenfetch
    - Configure locales
- 
+
+### Tools:
+   - Install neovim and configure it
+   - Install tmux with TPM(Tmux Plugin Manager)
+
 ### Python:
    - Install all dependencies(for bluetooth support too)
    - Download Python 3.11 source code

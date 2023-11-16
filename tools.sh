@@ -46,6 +46,9 @@ cat ./configs/nvim/init.lua >> ~/.config/nvim/init.lua
 sed -i "s/local M = {}/local M = {}\n M.plugins = 'custom.plugins'/" ~/.config/nvim/lua/custom/chadrc.lua
 cp ./configs/nvim/plugins.lua ~/.config/nvim/lua/custom/plugins.lua
 
+# Change theme
+sed -i "s/onedark/tokyonight/" ~/.config/nvim/lua/custom/chadrc.lua
+
 echo "--- Plugins options ---" >> ~/.config/nvim/lua/core/init.lua
 echo "g.suda_smart_edit = 1" >> ~/.config/nvim/lua/core/init.lua
 
