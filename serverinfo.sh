@@ -13,14 +13,6 @@ free_memory=$(free -m | awk 'NR==2{printf "Memory Usage: %sMB / %sMB (%.2f%%)\n"
 disk_usage=$(df -h / | grep "G" | awk {'print "Disk Usage: ",$3,"/",$2,"("$5")"'})
 load_average=$(uptime | awk -F 'load average: ' '{print "Load Average: " $2}')
 
-# Services:
-serv1="ssh"
-# serv2="postgres"
-
-# Docker containers:
-# container1="mongodb"
-# container2="linkwarden"
-
 # OS info
 [ -f /usr/bin/toilet ] && toilet -f mono12 -F metal -w 120 $TITLE || echo -e "$GREEN====== $TITLE ($HOSTIP) ======$BLACK"
 echo "Uptime: $uptime"
@@ -29,11 +21,13 @@ echo $disk_usage
 echo $load_average
 
 # Check services status
+serv1="ssh"
+# serv2="postgres"
+
 echo -e "\nServices Status: "
 [ "$(systemctl list-units --type=service --state=running | grep $serv1)" ] && echo -e "[$GREEN OK $BLACK] $serv1" || echo -e "[$RED FAIL $BLACK] $serv1"
-# [ "$(systemctl list-units --type=service --state=running | grep $serv2)" ] && echo -e "[$GREEN OK $BLACK] $serv2" || echo -e "[$RED FAIL $BLACK] $serv2"
 
 # If docker containers
-# echo -e "\nDocker containers: "
-# [ "$(docker ps | grep $container1)" ] && echo -e "[$GREEN OK $BLACK] $container1" || echo -e "[$RED FAIL $BLACK] $container1"
-# [ "$(docker ps | grep $container2)" ] && echo -e "[$GREEN OK $BLACK] $container2" || echo -e "[$RED FAIL $BLACK] $container2"
+[ -f /usr/bin/docker ] && echo -e "\nDocker containers: " || exit 0
+container1="ngix"
+[ "$(docker ps | grep $container1)" ] && echo -e "[$GREEN OK $BLACK] $container1" || echo -e "[$RED FAIL $BLACK] $container1"
