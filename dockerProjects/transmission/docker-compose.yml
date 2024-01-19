@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  transmission:
+    container_name: transmission
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Europe/Moscow
+      - USER=transmission
+      - PASS=transmission
+    image: lscr.io/linuxserver/transmission:latest
+    volumes:
+      - /etc/transmission:/config
+      - /mnt/movies:/movies
+    ports:
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
