@@ -4,18 +4,20 @@
 #     echo "https://example.com" | docker-compose run archivebox archivebox add
 #     docker-compose run archivebox add --depth=1 https://example.com/some/feed.rss
 
-version: '3.9'
+version: '3'
 
 services:
   archivebox:
+    container_name: archivebox
+    restart: unless-stopped
     image: ${DOCKER_IMAGE:-archivebox/archivebox:dev}
     command: server --quick-init 0.0.0.0:8000
     ports:
       - 8000:8000
     volumes:
-      - ./data:/data
-    restart: unless-stopped
+      - /volume1/docker/archivebox:/data
     environment:
+      - TZ=Europe/Moscow
       - ALLOWED_HOSTS=*
       - PUBLIC_INDEX=False
       - PUBLIC_SNAPSHOTS=False
