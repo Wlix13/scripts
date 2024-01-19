@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: postgres-linkwarden
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - TZ=Europe/Moscow
+    image: postgres:16-alpine
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+  linkwarden:
+    container_name: linkwarden
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - TZ=Europe/Moscow
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+    image: ghcr.io/linkwarden/linkwarden:latest
+    ports:
+      - 53577:3000
+    volumes:
+      - ./linkwarden:/data/data
+    depends_on:
+      - postgres
