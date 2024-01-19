@@ -5,7 +5,7 @@ curl -fsSL https://starship.rs/install.sh | sudo sh
 sed -i "s/ZSH_THEME=/# ZSH_THEME=/" ~/.zshrc
 
 # Install additional tools
-apt install zoxide direnv toilet -y
+sudo apt install zoxide direnv toilet -y
 
 # Config for direnv to load dotenv files
 mkdir -p ~/.config/direnv
@@ -35,4 +35,3 @@ sed -i "s/plugins=(git)/plugins=(\ngit\nzsh-autosuggestions\nzsh-syntax-highligh
 echo 'eval "$(starship init zsh)"' >> ~/.zshrc
 echo 'eval "$(zoxide init zsh)"' >> ~/.zshrc
 echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
-source ~/.zshrc
