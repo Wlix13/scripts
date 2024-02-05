@@ -17,7 +17,6 @@ $ENV:STARSHIP_CONFIG = "~/.config/starship.toml"
 # Tools
 # ---
 Invoke-Expression (&starship init powershell)
-Invoke-Expression (& { (zoxide init powershell | Out-String) })
 
 # ---
 # Aliases
@@ -55,18 +54,14 @@ Import-Module -Name Terminal-Icons
 Import-Module -Name EnvLoader
 Import-Module -Name Pansies
 Import-Module -Name Pode
+Import-Module -Name z
 
 # ---
 # For auto-completion
 # ---
 Import-Module posh-cargo
-
 Import-Module posh-dotnet
-
 Import-Module DockerCompletion
-
 Import-Module posh-git
-
 Import-Module PSKubectlCompletion
-
 Import-Module npm-completion
