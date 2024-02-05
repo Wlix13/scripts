@@ -29,9 +29,14 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
 # Enable plugins
-sed -i "s/plugins=(git)/plugins=(\ngit\nzsh-autosuggestions\nzsh-syntax-highlighting\n)/" ~/.zshrc
+# TODO: Read from .zshrc and append if not present
+# TODO: Make it readable
+sed -i "s|plugins=(git)|plugins=(\ngit\nzsh-autosuggestions\ndocker\nzsh-syntax-highlighting\n)\n\n# Completion option-stacking\nzstyle ':completion:*:*:docker:*' option-stacking yes\nzstyle ':completion:*:*:docker-*:*' option-stacking yes|" ~/.zshrc
 
 # Add to .zshrc
 echo 'eval "$(starship init zsh)"' >> ~/.zshrc
 echo 'eval "$(zoxide init zsh)"' >> ~/.zshrc
 echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
+
+echo 'Done! Please source ~/.zshrc to apply changes.'
+echo 'Also apply `autoload -U compinit && compinit` to fix zsh compinit issue'
